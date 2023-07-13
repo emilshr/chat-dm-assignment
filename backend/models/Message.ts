@@ -4,6 +4,7 @@ export interface Message {
   userId: string;
   inboxId: string;
   message: string;
+  timeStamp: Date;
 }
 
 const MessageSchema = new Schema<Message>({
@@ -18,6 +19,10 @@ const MessageSchema = new Schema<Message>({
   message: {
     type: String,
     required: true,
+  },
+  timeStamp: {
+    type: Date,
+    default: Date.now(),
   },
 });
 

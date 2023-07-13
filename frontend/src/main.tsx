@@ -2,21 +2,36 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  BrowserRouter,
+  createBrowserRouter,
+  Route,
+  Router,
+  RouterProvider,
+  Routes,
+} from "react-router-dom";
+import { AuthWrapper } from "./components/AuthWrapper.tsx";
+import { SignUp } from "./features/SignUp.tsx";
+import { Login } from "./features/Login.tsx";
+import { HomePage } from "./features/Home.tsx";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <div>Hello world!</div>,
-  },
-  {
-    path: "/home",
-    element: <App />,
-  },
-]);
+export const RootNavigator = () => {
+  return (
+    <Routes>
+      <Route Component={App} path="/" />
+      <Route Component={SignUp} path="/sign-up" />
+      <Route Component={Login} path="/login" />
+      <Route Component={HomePage} path="/home" />
+    </Routes>
+  );
+};
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <BrowserRouter basename="/">
+      <AuthWrapper>
+        <RootNavigator />
+      </AuthWrapper>
+    </BrowserRouter>
   </React.StrictMode>
 );

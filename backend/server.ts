@@ -4,9 +4,12 @@ import http from "http";
 import { connectToDatabase } from "./config/db";
 import { authRouter } from "./routers/auth.router";
 import { inboxRouter } from "./routers/inbox.router";
+import { messageRouter } from "./routers/message.router";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const server = http.createServer(app);
 
@@ -28,6 +31,7 @@ const { PORT = 3000 } = process.env;
 
 app.use("/auth", authRouter);
 app.use("/inbox", inboxRouter);
+app.use("/message", messageRouter);
 
 (async () => {
   await connectToDatabase();
