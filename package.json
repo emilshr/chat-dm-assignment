@@ -1,0 +1,23 @@
+{
+  "name": "chat-dm-assignment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start-backend": "npm run --prefix ./backend/ dev",
+    "start-frontend": "env-cmd -f .env npm run --prefix ./frontend/ dev",
+    "dev": "run-p start*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "localforage": "^1.10.0",
+    "match-sorter": "^6.3.1",
+    "react-router-dom": "^6.14.1",
+    "sort-by": "^1.2.0"
+  }
+}
