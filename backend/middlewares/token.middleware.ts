@@ -1,4 +1,4 @@
-import { NextFunction, RequestHandler } from "express";
+import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config";
 
@@ -12,7 +12,6 @@ export const verifyToken: RequestHandler = (req, _res, next) => {
       if (err) {
         throw new Error("unauthorized");
       }
-      console.log(JSON.stringify(req.body, null, 2));
       const { userId, username } = decoded as {
         username: string;
         userId: string;

@@ -5,8 +5,8 @@ export const authRouter = Router();
 
 authRouter.post("/login", (req, res, next) => {
   login(req.body.username, req.body.password)
-    .then((accessToken) => {
-      res.json({ accessToken });
+    .then((payload) => {
+      res.json(payload);
     })
     .catch((err) => {
       next(err);

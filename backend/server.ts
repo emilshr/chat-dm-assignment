@@ -6,10 +6,12 @@ import { authRouter } from "./routers/auth.router";
 import { inboxRouter } from "./routers/inbox.router";
 import { messageRouter } from "./routers/message.router";
 import cors from "cors";
+import { errorHandler } from "./middlewares/error-handler.middleware";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.urlencoded());
 
 const server = http.createServer(app);
 
@@ -25,9 +27,14 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("User connected", socket.client.request.headers.origin);
+  socket.on("message", (args) => {
+    console.log("data received", { args });
+  });
 });
 
 const { PORT = 3000 } = process.env;
+
+app.use(errorHandler);
 
 app.use("/auth", authRouter);
 app.use("/inbox", inboxRouter);

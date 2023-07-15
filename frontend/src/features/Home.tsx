@@ -1,32 +1,22 @@
-import { UserList } from "../components/UserList";
-import { useQuery } from "react-query";
-import { listUsers } from "../service/fetch.service";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../components/AuthContext";
-import { User } from "../types/schema";
+import { useParams } from "react-router-dom";
+import { SidePanelWrapper } from "../components/SidePanelWrapper";
+import { ChatWindow } from "../components/chat-window/ChatWindow";
+
+type Params = {
+  inboxId?: string;
+};
 
 export const HomePage = () => {
-  const { accessToken } = useContext(AuthContext);
-  const [data, setData] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (accessToken) {
-      setIsLoading(true);
-      listUsers(accessToken)
-        .then((value) => setData(value))
-        .catch((err) => console.error(err))
-        .finally(() => setIsLoading(false));
-    }
-  }, [accessToken]);
-
-  if (isLoading) {
-    return <div className="text-center">Loading ... </div>;
-  }
-
+  const { inboxId } = useParams<Params>();
   return (
-    <div className="flex flex-col">
-      <UserList users={data || []} />
-    </div>
+    <SidePanelWrapper>
+      {inboxId ? (
+        <ChatWindow inboxId={inboxId} />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center text-3xl">
+          Click on any inbox to view conversation
+        </div>
+      )}
+    </SidePanelWrapper>
   );
 };

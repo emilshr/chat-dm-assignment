@@ -1,13 +1,21 @@
-import { UserModel } from "../models/User";
+import { UserModel } from "../models/schema";
 import { comparePasswords, hashPassword, signToken } from "./password.service";
 
 export const login = async (username: string, password: string) => {
   try {
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({ where: { username } });
     if (user) {
-      const isPasswordValid = comparePasswords(password, user.hashedPassword);
+      const isPasswordValid = comparePasswords(
+        password,
+        user.dataValues.hashedPassword
+      );
       if (isPasswordValid) {
-        return signToken(username, user.id.toString());
+        const accessToken = signToken(username, user.dataValues.userId);
+        return {
+          userId: user.dataValues.userId,
+          username,
+          accessToken,
+        };
       }
     }
     throw new Error("invalid login");
@@ -19,7 +27,7 @@ export const login = async (username: string, password: string) => {
 
 export const signUp = async (username: string, password: string) => {
   try {
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({ where: { username } });
     if (user) {
       throw new Error("duplicate user found");
     }

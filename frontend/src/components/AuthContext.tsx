@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import React from "react";
-import { QueryClient } from "react-query";
 
 export interface IAuthContext {
   accessToken: string;
+  userName: string;
+  userId: string;
   setAccessToken: (token: string) => void;
-  queryClient: QueryClient;
+  setUserDetails: (userId: string, username: string) => void;
 }
 
 export const AuthContext = React.createContext<IAuthContext>({
   accessToken: "",
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  userId: "",
+  userName: "",
   setAccessToken(token) {},
-  queryClient: new QueryClient(),
+  setUserDetails(userId, username) {},
 });

@@ -1,42 +1,113 @@
-import { InboxModel, InboxStatus } from "../models/Inbox";
-import { UserModel } from "../models/User";
+import { Op } from "sequelize";
+import {
+  InboxParticipantModel,
+  UserModel,
+  InboxModel,
+  InboxParticipant,
+  InboxParticipantStatus,
+  MessageModel,
+} from "../models/schema";
 
-export const getInboxes = async (userId: string) => {
-  const foundInboxes = await InboxModel.find({ userId });
-  return foundInboxes;
+export const getInboxes = async (
+  userId: string,
+  inboxStatus: InboxParticipantStatus = InboxParticipantStatus.ACCEPTED
+) => {
+  const parsedData = await InboxParticipantModel.findAll({
+    where: { userId, inboxStatus },
+    include: [
+      {
+        model: InboxModel,
+        include: [
+          {
+            model: MessageModel,
+            limit: 1,
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: UserModel,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+  return parsedData;
+};
+
+export const getRequestCount = async (userId: string) => {
+  const { count } = await InboxParticipantModel.findAndCountAll({
+    where: { userId, inboxStatus: InboxParticipantStatus.NOT_ACCEPTED },
+  });
+  return count;
 };
 
 export const viewUsers = async (userId: string) => {
-  const allUsers = await UserModel.find({ _id: { $ne: userId } });
-  return allUsers;
+  const allUsers = await UserModel.findAll({
+    where: { userId: { [Op.not]: userId } },
+  });
+  console.log({ allUsers });
+  const parsedData = allUsers.map(({ dataValues }) => dataValues);
+  return parsedData;
 };
 
 export const createInbox = async (
   userId: string,
-  participatingUserId: string
+  participatingUserIds: string[],
+  inboxName: string
 ) => {
-  const foundInbox = await InboxModel.findOne({ participatingUserId, userId });
+  try {
+    const {
+      dataValues: { inboxId },
+    } = await InboxModel.create({ inboxName });
 
-  if (foundInbox) {
-    return foundInbox;
+    const payload = participatingUserIds.map<Omit<InboxParticipant, "id">>(
+      (uid) => ({
+        inboxId,
+        inboxStatus: InboxParticipantStatus.NOT_ACCEPTED,
+        userId: uid,
+      })
+    );
+
+    await InboxParticipantModel.bulkCreate([
+      {
+        inboxId,
+        inboxStatus: InboxParticipantStatus.ACCEPTED,
+        userId,
+      },
+      ...payload,
+    ]);
+
+    return inboxId;
+  } catch (err) {
+    console.error("Error: ", err);
   }
-
-  const createdInbox = await InboxModel.create({
-    inboxStatus: InboxStatus.NOT_ACCEPTED,
-    participatingUserId,
-    userId,
-  });
-  return createdInbox;
 };
 
 export const getInboxMetaData = async (userId: string, inboxId: string) => {
-  const foundInbox = await InboxModel.findById(inboxId);
-  if (foundInbox) {
-    const { participatingUserId } = foundInbox;
-    const foundUser = await UserModel.findById(participatingUserId);
-    if (foundUser) {
-      return foundUser;
-    }
-  }
-  throw new Error("invalid inbox");
+  const data = await InboxModel.findOne({
+    where: { inboxId },
+    include: [
+      UserModel,
+      {
+        through: {
+          where: {
+            userId,
+          },
+        },
+      },
+    ],
+  });
+};
+
+export const respondToInbox = async (
+  inboxStatus: InboxParticipantStatus,
+  inboxId: string,
+  userId: string
+) => {
+  const data = await InboxParticipantModel.update(
+    { inboxStatus },
+    { returning: true, where: { inboxId, userId } }
+  );
+  return data;
 };
