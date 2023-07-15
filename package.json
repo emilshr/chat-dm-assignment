@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "install-deps-backend": "cd backend && npm install",
+    "install-deps-frontend": "cd frontend && npm install",
     "start-backend": "npm run --prefix ./backend/ dev",
     "start-frontend": "env-cmd -f .env npm run --prefix ./frontend/ dev",
-    "dev": "run-p start*"
+    "dev": "run-s install-deps* start*"
   },
   "keywords": [],
   "author": "",
