@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { BASE_URL } from "../common/constants";
@@ -11,7 +11,7 @@ export const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const { isLoading, data, mutate } = useMutation<
+  const { isLoading, data, mutate, error } = useMutation<
     { data: { accessToken: string; userId: string; username: string } },
     unknown,
     { username: string; password: string }
@@ -59,6 +59,14 @@ export const Login = () => {
           Login
         </button>
       </div>
+      {error instanceof AxiosError ? (
+        <div className="w-[50%] bg-red-300 p-4 rounded-md">
+          <div>{error.code}</div>
+          <pre className="w-full break-words flex-wrap flex whitespace-pre-wrap">
+            {error.response?.data}
+          </pre>
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -26,10 +26,13 @@ export const RequestListing = () => {
       );
     }
     return (
-      <div className="flex flex-col w-full hover:bg-slate-500 cursor-pointer p-2 rounded-md">
+      <div className="flex flex-col w-full gap-y-3">
         {data.data.map((request) => {
           return (
-            <div key={request.inboxId} className="flex w-full justify-between">
+            <div
+              key={request.inboxId}
+              className="flex w-full justify-between gap-y-2 hover:bg-slate-500 cursor-pointer rounded-md p-2"
+            >
               <div className="flex flex-col gap-y-2">
                 <div className="text-3xl font-bold">
                   {request.Inbox.inboxName}
